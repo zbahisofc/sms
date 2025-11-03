@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZSMS Yönetim Paneli</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body class="bg-gray-50 text-gray-800">
 
 <!-- LOGIN -->
 <div id="loginScreen" class="flex flex-col justify-center items-center min-h-screen">
   <div class="bg-white p-8 rounded-xl shadow-lg w-80 text-center">
     <h1 class="text-2xl font-bold mb-6 text-gray-700">🔐 ZSMS Giriş</h1>
-    <input id="username" placeholder="Kullanıcı Adı" class="w-full border p-2 rounded mb-3" />
-    <input id="password" type="password" placeholder="Şifre" class="w-full border p-2 rounded mb-4" />
-    <button onclick="login()" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">Giriş Yap</button>
+    <input id="username" placeholder="Kullanıcı Adı" class="w-full border p-2 rounded mb-3">
+    <input id="password" type="password" placeholder="Şifre" class="w-full border p-2 rounded mb-4">
+    <button id="loginBtn" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">Giriş Yap</button>
     <p id="loginError" class="text-red-500 text-sm mt-3 hidden">❌ Hatalı kullanıcı adı veya şifre!</p>
   </div>
 </div>
@@ -26,58 +25,51 @@
 <div id="dashboard" class="hidden min-h-screen">
   <header class="bg-white shadow p-4 flex justify-between items-center">
     <h1 class="text-xl font-bold text-blue-700">📊 ZSMS Yönetim Paneli</h1>
-    <button onclick="logout()" class="bg-red-500 text-white px-4 py-1 rounded">Çıkış</button>
+    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-1 rounded">Çıkış</button>
   </header>
 
   <nav class="flex justify-center gap-4 mt-4">
-    <button onclick="showTab('gonderilen')" id="tab-gonderilen" class="px-4 py-2 rounded bg-blue-600 text-white">Gönderilen SMS</button>
-    <button onclick="showTab('satin')" id="tab-satin" class="px-4 py-2 rounded bg-white border">Satın Alınan SMS</button>
-    <button onclick="showTab('rapor')" id="tab-rapor" class="px-4 py-2 rounded bg-white border">Genel Rapor</button>
+    <button id="tab-gonderilen" class="px-4 py-2 rounded bg-blue-600 text-white">Gönderilen SMS</button>
+    <button id="tab-satin" class="px-4 py-2 rounded bg-white border">Satın Alınan SMS</button>
+    <button id="tab-rapor" class="px-4 py-2 rounded bg-white border">Genel Rapor</button>
   </nav>
 
   <main class="max-w-6xl mx-auto mt-6 p-4">
-
     <!-- Arama -->
     <div class="flex flex-wrap items-center gap-2 mb-3">
-      <input id="searchBox" placeholder="Ara (provider veya açıklama)" class="border p-2 rounded flex-1" oninput="filterTables()">
+      <input id="searchBox" placeholder="Ara (provider veya açıklama)" class="border p-2 rounded flex-1">
     </div>
 
     <!-- Gönderilen -->
     <div id="gonderilen" class="bg-white p-6 rounded-xl shadow">
       <h2 class="text-lg font-semibold mb-4">Gönderilen SMS Ekle</h2>
-      <form onsubmit="addRecord(event,'gonderilen')" class="grid md:grid-cols-3 gap-3">
+      <form id="formGonderilen" class="grid md:grid-cols-3 gap-3">
         <input id="g-tarih" type="date" class="border p-2 rounded" required>
-        <select id="g-provider" class="border p-2 rounded">
-          <option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option>
-        </select>
+        <select id="g-provider" class="border p-2 rounded"><option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option></select>
         <input id="g-sms" type="number" placeholder="SMS Adedi" class="border p-2 rounded" required>
         <input id="g-aciklama" placeholder="Açıklama" class="border p-2 rounded md:col-span-2">
         <button class="bg-blue-600 text-white rounded py-2 hover:bg-blue-700">Ekle</button>
       </form>
       <table id="g-table" class="w-full border text-sm mt-4">
-        <thead class="bg-gray-100">
-          <tr><th class="p-2">Tarih</th><th class="p-2">Provider</th><th class="p-2">SMS</th><th class="p-2">Açıklama</th><th class="p-2">İşlem</th></tr>
-        </thead><tbody></tbody>
+        <thead class="bg-gray-100"><tr><th class="p-2">Tarih</th><th class="p-2">Provider</th><th class="p-2">SMS</th><th class="p-2">Açıklama</th><th class="p-2">İşlem</th></tr></thead>
+        <tbody></tbody>
       </table>
     </div>
 
     <!-- Satın -->
     <div id="satin" class="bg-white p-6 rounded-xl shadow hidden">
       <h2 class="text-lg font-semibold mb-4">Satın Alınan SMS Ekle</h2>
-      <form onsubmit="addRecord(event,'satin')" class="grid md:grid-cols-3 gap-3">
+      <form id="formSatin" class="grid md:grid-cols-3 gap-3">
         <input id="s-tarih" type="date" class="border p-2 rounded" required>
-        <select id="s-provider" class="border p-2 rounded">
-          <option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option>
-        </select>
+        <select id="s-provider" class="border p-2 rounded"><option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option></select>
         <input id="s-sms" type="number" placeholder="SMS Adedi" class="border p-2 rounded" required>
         <input id="s-odeme" type="number" placeholder="Ödeme (TL)" class="border p-2 rounded" required>
         <input id="s-aciklama" placeholder="Açıklama" class="border p-2 rounded md:col-span-2">
         <button class="bg-blue-600 text-white rounded py-2 hover:bg-blue-700">Ekle</button>
       </form>
       <table id="s-table" class="w-full border text-sm mt-4">
-        <thead class="bg-gray-100">
-          <tr><th class="p-2">Tarih</th><th class="p-2">Provider</th><th class="p-2">SMS</th><th class="p-2">Ödeme</th><th class="p-2">Açıklama</th><th class="p-2">İşlem</th></tr>
-        </thead><tbody></tbody>
+        <thead class="bg-gray-100"><tr><th class="p-2">Tarih</th><th class="p-2">Provider</th><th class="p-2">SMS</th><th class="p-2">Ödeme</th><th class="p-2">Açıklama</th><th class="p-2">İşlem</th></tr></thead>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -85,19 +77,17 @@
     <div id="rapor" class="bg-white p-6 rounded-xl shadow hidden">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">📈 Genel Rapor</h2>
-        <button onclick="downloadCSV()" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">CSV İndir</button>
+        <button id="csvBtn" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">CSV İndir</button>
       </div>
       <div class="flex flex-wrap gap-2 mb-4 items-center">
         <label>Başlangıç:</label><input id="startDate" type="date" class="border p-2 rounded">
         <label>Bitiş:</label><input id="endDate" type="date" class="border p-2 rounded">
-        <button onclick="renderReport()" class="bg-blue-600 text-white px-3 py-2 rounded">Filtrele</button>
+        <button id="filterBtn" class="bg-blue-600 text-white px-3 py-2 rounded">Filtrele</button>
       </div>
       <div id="raporSummary" class="grid md:grid-cols-3 gap-4 mb-6"></div>
       <h3 class="font-semibold mb-2">Provider Bazlı Dağılım</h3>
       <table id="p-table" class="w-full border text-sm mb-6">
-        <thead class="bg-gray-100">
-          <tr><th class="p-2">Provider</th><th class="p-2">Gönderilen</th><th class="p-2">Satın Alınan</th><th class="p-2">Toplam</th></tr>
-        </thead><tbody></tbody>
+        <thead class="bg-gray-100"><tr><th class="p-2">Provider</th><th class="p-2">Gönderilen</th><th class="p-2">Satın Alınan</th><th class="p-2">Toplam</th></tr></thead><tbody></tbody>
       </table>
       <canvas id="pieChart" height="300"></canvas>
     </div>
@@ -108,72 +98,121 @@
 const SUPABASE_URL = "https://vmaklqxcedoanzmwppfm.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtYWtscXhjZWRvYW56bXdwcGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODQyMjgsImV4cCI6MjA3Nzc2MDIyOH0.5de5GFYaZd04vSz5T0rE45N2DUzXJKrsXxuDQTd7tJc";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let gonderilen=[], satin=[];
+let gonderilen = [], satin = [];
 
-// LOGIN
-function login(){const u=username.value.trim(),p=password.value.trim();
-if(u==="admin"&&p==="zsms123"){loginScreen.style.display="none";dashboard.classList.remove("hidden");loadData();}
-else loginError.classList.remove("hidden");}
-function logout(){dashboard.classList.add("hidden");loginScreen.style.display="flex";}
+document.getElementById('loginBtn').onclick = doLogin;
+document.getElementById('logoutBtn').onclick = doLogout;
+document.getElementById('tab-gonderilen').onclick = () => showTab('gonderilen');
+document.getElementById('tab-satin').onclick = () => showTab('satin');
+document.getElementById('tab-rapor').onclick = () => showTab('rapor');
+document.getElementById('formGonderilen').onsubmit = e => addRecord(e, 'gonderilen');
+document.getElementById('formSatin').onsubmit = e => addRecord(e, 'satin');
+document.getElementById('searchBox').oninput = filterTables;
+document.getElementById('csvBtn').onclick = downloadCSV;
+document.getElementById('filterBtn').onclick = renderReport;
 
-// TABLAR
-function showTab(tab){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('bg-blue-600','text-white'));
-document.getElementById('tab-'+tab).classList.add('bg-blue-600','text-white');
-['gonderilen','satin','rapor'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
-document.getElementById(tab).classList.remove('hidden');
-if(tab==='rapor')renderReport();}
+function doLogin(){
+  const u = username.value.trim(), p = password.value.trim();
+  if(u === "admin" && p === "zsms123"){
+    loginScreen.style.display = "none";
+    dashboard.classList.remove("hidden");
+    loadData();
+  } else loginError.classList.remove("hidden");
+}
+function doLogout(){
+  dashboard.classList.add("hidden");
+  loginScreen.style.display = "flex";
+}
+function showTab(tab){
+  ['gonderilen','satin','rapor'].forEach(id=>{
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('tab-gonderilen').classList.remove('bg-blue-600','text-white');
+  document.getElementById('tab-satin').classList.remove('bg-blue-600','text-white');
+  document.getElementById('tab-rapor').classList.remove('bg-blue-600','text-white');
+  document.getElementById('tab-'+tab).classList.add('bg-blue-600','text-white');
+  document.getElementById(tab).classList.remove('hidden');
+  if(tab==='rapor') renderReport();
+}
 
-async function loadData(){const {data,error}=await sb.from('sms_records').select('*');
-if(error){console.error(error);return;}
-gonderilen=data.filter(x=>x.type==='gonderilen');satin=data.filter(x=>x.type==='satin');renderTables();}
+async function loadData(){
+  const { data, error } = await sb.from('sms_records').select('*');
+  if(error){console.error(error);return;}
+  gonderilen = data.filter(x=>x.type==='gonderilen');
+  satin = data.filter(x=>x.type==='satin');
+  renderTables();
+}
 
-async function addRecord(e,type){e.preventDefault();
-const rec={type,
-tarih:type==='gonderilen'?document.getElementById('g-tarih').value:document.getElementById('s-tarih').value,
-provider:type==='gonderilen'?document.getElementById('g-provider').value:document.getElementById('s-provider').value,
-sms:Number(type==='gonderilen'?document.getElementById('g-sms').value:document.getElementById('s-sms').value),
-odeme:type==='satin'?Number(document.getElementById('s-odeme').value):null,
-aciklama:type==='gonderilen'?document.getElementById('g-aciklama').value:document.getElementById('s-aciklama').value};
-await sb.from('sms_records').insert([rec]);loadData();}
+async function addRecord(e, type){
+  e.preventDefault();
+  const rec = {
+    type,
+    tarih: document.getElementById(type==='gonderilen'?'g-tarih':'s-tarih').value,
+    provider: document.getElementById(type==='gonderilen'?'g-provider':'s-provider').value,
+    sms: Number(document.getElementById(type==='gonderilen'?'g-sms':'s-sms').value),
+    odeme: type==='satin'?Number(document.getElementById('s-odeme').value):null,
+    aciklama: document.getElementById(type==='gonderilen'?'g-aciklama':'s-aciklama').value
+  };
+  const { error } = await sb.from('sms_records').insert([rec]);
+  if(error) alert(error.message);
+  else loadData();
+}
 
-async function deleteRecord(id){if(!confirm('Silinsin mi?'))return;await sb.from('sms_records').delete().eq('id',id);loadData();}
+async function deleteRecord(id){ if(confirm('Silinsin mi?')){ await sb.from('sms_records').delete().eq('id',id); loadData(); } }
 
-function editRecord(id,type){const arr=type==='gonderilen'?gonderilen:satin;const r=arr.find(x=>x.id===id);
-if(!r)return;if(type==='gonderilen'){g-tarih.value=r.tarih;g-provider.value=r.provider;g-sms.value=r.sms;g-aciklama.value=r.aciklama||'';}else{s-tarih.value=r.tarih;s-provider.value=r.provider;s-sms.value=r.sms;s-odeme.value=r.odeme||0;s-aciklama.value=r.aciklama||'';}arr.editingId=id;}
+function renderTables(){
+  render('g', gonderilen);
+  render('s', satin);
+}
+function render(type, arr){
+  const tbody = document.querySelector(`#${type}-table tbody`);
+  tbody.innerHTML='';
+  arr.forEach(r=>{
+    const del = `<button class='text-red-600 ml-2' onclick='deleteRecord(${r.id})'>🗑️</button>`;
+    tbody.innerHTML += type==='g'
+      ? `<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'>${del}</td></tr>`
+      : `<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.odeme||0}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'>${del}</td></tr>`;
+  });
+}
+function filterTables(){
+  const q = searchBox.value.toLowerCase();
+  document.querySelectorAll('tbody tr').forEach(tr=>{
+    tr.style.display = tr.innerText.toLowerCase().includes(q)?'':'none';
+  });
+}
 
-async function updateRecord(type){const id=(type==='gonderilen'?gonderilen:satin).editingId;if(!id)return;
-const rec={tarih:type==='gonderilen'?g-tarih.value:s-tarih.value,provider:type==='gonderilen'?g-provider.value:s-provider.value,
-sms:Number(type==='gonderilen'?g-sms.value:s-sms.value),odeme:type==='satin'?Number(s-odeme.value):null,aciklama:type==='gonderilen'?g-aciklama.value:s-aciklama.value};
-await sb.from('sms_records').update(rec).eq('id',id);(type==='gonderilen'?gonderilen:satin).editingId=null;loadData();}
-
-function renderTables(){render('g');render('s');}
-function render(type){const arr=type==='g'?gonderilen:satin;const tbody=document.querySelector(`#${type}-table tbody`);tbody.innerHTML='';
-arr.forEach(r=>{tbody.innerHTML+=type==='g'
-?`<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'gonderilen')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`
-:`<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.odeme||0}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'satin')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`});}
-
-function filterTables(){const q=searchBox.value.toLowerCase();document.querySelectorAll('tbody tr').forEach(tr=>{tr.style.display=tr.innerText.toLowerCase().includes(q)?'':'none';});}
-
-async function renderReport(){const from=startDate.value,to=endDate.value;let {data}=await sb.from('sms_records').select('*');
-if(from)data=data.filter(d=>d.tarih>=from);if(to)data=data.filter(d=>d.tarih<=to);
-const g=data.filter(x=>x.type==='gonderilen');const s=data.filter(x=>x.type==='satin');
-const totalSent=g.reduce((a,b)=>a+b.sms,0),totalPurchased=s.reduce((a,b)=>a+b.sms,0),totalPayment=s.reduce((a,b)=>a+(b.odeme||0),0);
-raporSummary.innerHTML=`<div class='bg-blue-50 p-4 rounded-lg'><p>Gönderilen</p><h3 class='text-2xl font-bold text-blue-700'>${totalSent}</h3></div>
-<div class='bg-green-50 p-4 rounded-lg'><p>Satın Alınan</p><h3 class='text-2xl font-bold text-green-700'>${totalPurchased}</h3></div>
-<div class='bg-amber-50 p-4 rounded-lg'><p>Toplam Ödeme</p><h3 class='text-2xl font-bold text-amber-700'>${totalPayment.toFixed(2)} TL</h3></div>`;
-const tbody=document.querySelector('#p-table tbody');tbody.innerHTML='';
-['Savaş Sms','Deniz Sms','Özer Sms'].forEach(p=>{const gsum=g.filter(x=>x.provider===p).reduce((a,b)=>a+b.sms,0);
-const ssum=s.filter(x=>x.provider===p).reduce((a,b)=>a+b.sms,0);
-tbody.innerHTML+=`<tr class='border-t'><td class='p-2 font-semibold'>${p}</td><td class='p-2'>${gsum}</td><td class='p-2'>${ssum}</td><td class='p-2 font-semibold'>${gsum+ssum}</td></tr>`;});
-drawChart(totalSent,totalPurchased);}
-
-function drawChart(sent,purchased){const ctx=pieChart.getContext('2d');if(window.pieChart)window.pieChart.destroy();
-window.pieChart=new Chart(ctx,{type:'pie',data:{labels:['Gönderilen','Satın Alınan'],datasets:[{data:[sent,purchased],backgroundColor:['#00C49F','#FF8042']}]},options:{responsive:true}});}
-
-async function downloadCSV(){const {data}=await sb.from('sms_records').select('*');
-let csv='Tip,Tarih,Provider,SMS,Ödeme,Açıklama\n';data.forEach(r=>{csv+=`${r.type},${r.tarih},${r.provider},${r.sms},${r.odeme||''},"${r.aciklama||''}"\n`;});
-const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');
-a.href=url;a.download='ZSMS_Rapor.csv';a.click();URL.revokeObjectURL(url);}
+async function renderReport(){
+  const from = startDate.value, to = endDate.value;
+  let { data } = await sb.from('sms_records').select('*');
+  if(from) data=data.filter(d=>d.tarih>=from);
+  if(to) data=data.filter(d=>d.tarih<=to);
+  const g = data.filter(x=>x.type==='gonderilen'), s=data.filter(x=>x.type==='satin');
+  const totalSent=g.reduce((a,b)=>a+b.sms,0), totalPurchased=s.reduce((a,b)=>a+b.sms,0), totalPayment=s.reduce((a,b)=>a+(b.odeme||0),0);
+  raporSummary.innerHTML = `
+    <div class='bg-blue-50 p-4 rounded-lg'><p>Gönderilen SMS</p><h3 class='text-2xl font-bold text-blue-700'>${totalSent}</h3></div>
+    <div class='bg-green-50 p-4 rounded-lg'><p>Satın Alınan SMS</p><h3 class='text-2xl font-bold text-green-700'>${totalPurchased}</h3></div>
+    <div class='bg-amber-50 p-4 rounded-lg'><p>Toplam Ödeme</p><h3 class='text-2xl font-bold text-amber-700'>${totalPayment.toFixed(2)} TL</h3></div>`;
+  const tbody=document.querySelector('#p-table tbody');tbody.innerHTML='';
+  ['Savaş Sms','Deniz Sms','Özer Sms'].forEach(p=>{
+    const gsum=g.filter(x=>x.provider===p).reduce((a,b)=>a+b.sms,0);
+    const ssum=s.filter(x=>x.provider===p).reduce((a,b)=>a+b.sms,0);
+    tbody.innerHTML+=`<tr class='border-t'><td class='p-2 font-semibold'>${p}</td><td class='p-2'>${gsum}</td><td class='p-2'>${ssum}</td><td class='p-2 font-semibold'>${gsum+ssum}</td></tr>`;
+  });
+  drawChart(totalSent,totalPurchased);
+}
+function drawChart(sent,purchased){
+  const ctx=document.getElementById('pieChart').getContext('2d');
+  if(window.pieChart) window.pieChart.destroy();
+  window.pieChart=new Chart(ctx,{type:'pie',data:{labels:['Gönderilen','Satın Alınan'],datasets:[{data:[sent,purchased],backgroundColor:['#00C49F','#FF8042']}]},options:{responsive:true}});
+}
+async function downloadCSV(){
+  const { data } = await sb.from('sms_records').select('*');
+  let csv='Tip,Tarih,Provider,SMS,Ödeme,Açıklama\n';
+  data.forEach(r=>{csv+=`${r.type},${r.tarih},${r.provider},${r.sms},${r.odeme||''},"${r.aciklama||''}"\n`;});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='ZSMS_Rapor.csv';a.click();URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
