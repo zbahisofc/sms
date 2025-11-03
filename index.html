@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ZSMS Yönetim Paneli</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.6/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
@@ -14,8 +13,8 @@
 <div id="loginScreen" class="flex flex-col justify-center items-center min-h-screen">
   <div class="bg-white p-8 rounded-xl shadow-lg w-80 text-center">
     <h1 class="text-2xl font-bold mb-6 text-gray-700">🔐 ZSMS Giriş</h1>
-    <input id="username" placeholder="Kullanıcı Adı" class="w-full border p-2 rounded mb-3"/>
-    <input id="password" type="password" placeholder="Şifre" class="w-full border p-2 rounded mb-4"/>
+    <input id="username" placeholder="Kullanıcı Adı" class="w-full border p-2 rounded mb-3" />
+    <input id="password" type="password" placeholder="Şifre" class="w-full border p-2 rounded mb-4" />
     <button onclick="login()" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">Giriş Yap</button>
     <p id="loginError" class="text-red-500 text-sm mt-3 hidden">❌ Hatalı kullanıcı adı veya şifre!</p>
   </div>
@@ -29,23 +28,26 @@
   </header>
 
   <nav class="flex justify-center gap-4 mt-4">
-    <button onclick="showTab('gonderilen')" id="tab-gonderilen" class="px-4 py-2 rounded bg-blue-600 text-white">Gönderilen</button>
-    <button onclick="showTab('satin')" id="tab-satin" class="px-4 py-2 rounded bg-white border">Satın Alınan</button>
-    <button onclick="showTab('rapor')" id="tab-rapor" class="px-4 py-2 rounded bg-white border">Rapor</button>
+    <button onclick="showTab('gonderilen')" id="tab-gonderilen" class="px-4 py-2 rounded bg-blue-600 text-white">Gönderilen SMS</button>
+    <button onclick="showTab('satin')" id="tab-satin" class="px-4 py-2 rounded bg-white border">Satın Alınan SMS</button>
+    <button onclick="showTab('rapor')" id="tab-rapor" class="px-4 py-2 rounded bg-white border">Genel Rapor</button>
   </nav>
 
   <main class="max-w-6xl mx-auto mt-6 p-4">
-    <!-- Arama / Filtre -->
+
+    <!-- Arama -->
     <div class="flex flex-wrap items-center gap-2 mb-3">
-      <input id="searchBox" placeholder="Ara (provider veya açıklama)" class="border p-2 rounded flex-1" oninput="filterTables()"/>
+      <input id="searchBox" placeholder="Ara (provider veya açıklama)" class="border p-2 rounded flex-1" oninput="filterTables()">
     </div>
 
     <!-- Gönderilen -->
     <div id="gonderilen" class="bg-white p-6 rounded-xl shadow">
-      <h2 class="text-lg font-semibold mb-4">Gönderilen SMS</h2>
+      <h2 class="text-lg font-semibold mb-4">Gönderilen SMS Ekle</h2>
       <form onsubmit="addRecord(event,'gonderilen')" class="grid md:grid-cols-3 gap-3">
         <input id="g-tarih" type="date" class="border p-2 rounded" required>
-        <select id="g-provider" class="border p-2 rounded"><option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option></select>
+        <select id="g-provider" class="border p-2 rounded">
+          <option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option>
+        </select>
         <input id="g-sms" type="number" placeholder="SMS Adedi" class="border p-2 rounded" required>
         <input id="g-aciklama" placeholder="Açıklama" class="border p-2 rounded md:col-span-2">
         <button class="bg-blue-600 text-white rounded py-2 hover:bg-blue-700">Ekle</button>
@@ -57,12 +59,14 @@
       </table>
     </div>
 
-    <!-- Satın Alınan -->
+    <!-- Satın -->
     <div id="satin" class="bg-white p-6 rounded-xl shadow hidden">
-      <h2 class="text-lg font-semibold mb-4">Satın Alınan SMS</h2>
+      <h2 class="text-lg font-semibold mb-4">Satın Alınan SMS Ekle</h2>
       <form onsubmit="addRecord(event,'satin')" class="grid md:grid-cols-3 gap-3">
         <input id="s-tarih" type="date" class="border p-2 rounded" required>
-        <select id="s-provider" class="border p-2 rounded"><option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option></select>
+        <select id="s-provider" class="border p-2 rounded">
+          <option>Savaş Sms</option><option>Deniz Sms</option><option>Özer Sms</option>
+        </select>
         <input id="s-sms" type="number" placeholder="SMS Adedi" class="border p-2 rounded" required>
         <input id="s-odeme" type="number" placeholder="Ödeme (TL)" class="border p-2 rounded" required>
         <input id="s-aciklama" placeholder="Açıklama" class="border p-2 rounded md:col-span-2">
@@ -78,71 +82,122 @@
 </div>
 
 <script>
-const SUPABASE_URL="https://vmaklqxcedoanzmwppfm.supabase.co";        // kendi url
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtYWtscXhjZWRvYW56bXdwcGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODQyMjgsImV4cCI6MjA3Nzc2MDIyOH0.5de5GFYaZd04vSz5T0rE45N2DUzXJKrsXxuDQTd7tJc";   // kendi key
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let gonderilen=[],satin=[];
+const SUPABASE_URL = "https://vmaklqxcedoanzmwppfm.supabase.co";        // kendi URL
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtYWtscXhjZWRvYW56bXdwcGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODQyMjgsImV4cCI6MjA3Nzc2MDIyOH0.5de5GFYaZd04vSz5T0rE45N2DUzXJKrsXxuDQTd7tJc";   // kendi Anon key
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let gonderilen=[], satin=[];
 
-function login(){const u=username.value.trim(),p=password.value.trim();
-if(u==="admin"&&p==="zsms123"){loginScreen.style.display="none";dashboard.classList.remove("hidden");loadData();}
-else loginError.classList.remove("hidden");}
-function logout(){dashboard.classList.add("hidden");loginScreen.style.display="flex";}
-function showTab(tab){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('bg-blue-600','text-white'));
-document.getElementById('tab-'+tab).classList.add('bg-blue-600','text-white');
-['gonderilen','satin','rapor'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
-if(document.getElementById(tab))document.getElementById(tab).classList.remove('hidden');}
+// LOGIN
+function login(){
+  const u=document.getElementById('username').value.trim();
+  const p=document.getElementById('password').value.trim();
+  if(u==="admin" && p==="zsms123"){
+    document.getElementById('loginScreen').style.display="none";
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadData();
+  } else document.getElementById('loginError').classList.remove('hidden');
+}
+function logout(){
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loginScreen').style.display="flex";
+}
 
+// TAB DEĞİŞİMİ
+function showTab(tab){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('bg-blue-600','text-white'));
+  document.getElementById('tab-'+tab).classList.add('bg-blue-600','text-white');
+  ['gonderilen','satin','rapor'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.add('hidden');
+  });
+  const section=document.getElementById(tab);
+  if(section) section.classList.remove('hidden');
+}
+
+// VERİLERİ YÜKLE
 async function loadData(){
-  const {data}=await sb.from('sms_records').select('*');
-  gonderilen=data.filter(x=>x.type==='gonderilen');satin=data.filter(x=>x.type==='satin');
+  const { data, error } = await sb.from('sms_records').select('*');
+  if(error) { console.error(error); return; }
+  gonderilen=data.filter(x=>x.type==='gonderilen');
+  satin=data.filter(x=>x.type==='satin');
   renderTables();
 }
 
+// KAYIT EKLE
 async function addRecord(e,type){
   e.preventDefault();
-  const rec={type,
-    tarih:type==='gonderilen'?gTarih.value:sTarih.value,
-    provider:type==='gonderilen'?gProvider.value:sProvider.value,
-    sms:Number(type==='gonderilen'?gSms.value:sSms.value),
-    odeme:type==='satin'?Number(sOdeme.value):null,
-    aciklama:type==='gonderilen'?gAciklama.value:sAciklama.value};
-  await sb.from('sms_records').insert([rec]);await loadData();
+  const rec={
+    type,
+    tarih:type==='gonderilen'? document.getElementById('g-tarih').value : document.getElementById('s-tarih').value,
+    provider:type==='gonderilen'? document.getElementById('g-provider').value : document.getElementById('s-provider').value,
+    sms:Number(type==='gonderilen'? document.getElementById('g-sms').value : document.getElementById('s-sms').value),
+    odeme:type==='satin'? Number(document.getElementById('s-odeme').value) : null,
+    aciklama:type==='gonderilen'? document.getElementById('g-aciklama').value : document.getElementById('s-aciklama').value
+  };
+  const { error } = await sb.from('sms_records').insert([rec]);
+  if(error){alert('Hata: '+error.message);return;}
+  await loadData();
 }
 
-async function deleteRecord(id){if(!confirm('Silmek istiyor musun?'))return;
-await sb.from('sms_records').delete().eq('id',id);await loadData();}
+// SİL
+async function deleteRecord(id){
+  if(!confirm('Silmek istiyor musun?')) return;
+  await sb.from('sms_records').delete().eq('id',id);
+  await loadData();
+}
 
+// DÜZENLE
 function editRecord(id,type){
-  const arr=type==='gonderilen'?gonderilen:satin;const r=arr.find(x=>x.id===id);if(!r)return;
-  if(type==='gonderilen'){gTarih.value=r.tarih;gProvider.value=r.provider;gSms.value=r.sms;gAciklama.value=r.aciklama;}
-  else{sTarih.value=r.tarih;sProvider.value=r.provider;sSms.value=r.sms;sOdeme.value=r.odeme;sAciklama.value=r.aciklama;}
+  const arr=type==='gonderilen'?gonderilen:satin;
+  const r=arr.find(x=>x.id===id);
+  if(!r)return;
+  if(type==='gonderilen'){
+    document.getElementById('g-tarih').value=r.tarih;
+    document.getElementById('g-provider').value=r.provider;
+    document.getElementById('g-sms').value=r.sms;
+    document.getElementById('g-aciklama').value=r.aciklama||'';
+  }else{
+    document.getElementById('s-tarih').value=r.tarih;
+    document.getElementById('s-provider').value=r.provider;
+    document.getElementById('s-sms').value=r.sms;
+    document.getElementById('s-odeme').value=r.odeme||0;
+    document.getElementById('s-aciklama').value=r.aciklama||'';
+  }
   arr.editingId=id;
 }
 
+// GÜNCELLE
 async function updateRecord(type){
-  const id=(type==='gonderilen'?gonderilen:satin).editingId;if(!id)return;
-  const rec={tarih:type==='gonderilen'?gTarih.value:sTarih.value,
-    provider:type==='gonderilen'?gProvider.value:sProvider.value,
-    sms:Number(type==='gonderilen'?gSms.value:sSms.value),
-    odeme:type==='satin'?Number(sOdeme.value):null,
-    aciklama:type==='gonderilen'?gAciklama.value:sAciklama.value};
+  const id=(type==='gonderilen'?gonderilen:satin).editingId;
+  if(!id)return;
+  const rec={
+    tarih:type==='gonderilen'? document.getElementById('g-tarih').value : document.getElementById('s-tarih').value,
+    provider:type==='gonderilen'? document.getElementById('g-provider').value : document.getElementById('s-provider').value,
+    sms:Number(type==='gonderilen'? document.getElementById('g-sms').value : document.getElementById('s-sms').value),
+    odeme:type==='satin'? Number(document.getElementById('s-odeme').value) : null,
+    aciklama:type==='gonderilen'? document.getElementById('g-aciklama').value : document.getElementById('s-aciklama').value
+  };
   await sb.from('sms_records').update(rec).eq('id',id);
-  (type==='gonderilen'?gonderilen:satin).editingId=null;await loadData();
+  (type==='gonderilen'?gonderilen:satin).editingId=null;
+  await loadData();
 }
 
+// TABLOLARI YENİLE
 function renderTables(){render('g');render('s');}
 function render(type){
-  const arr=type==='g'?gonderilen:satin;const tbody=document.querySelector(`#${type}-table tbody`);
+  const arr=type==='g'?gonderilen:satin;
+  const tbody=document.querySelector(`#${type}-table tbody`);
   tbody.innerHTML='';
   arr.forEach(r=>{
-    tbody.innerHTML+=type==='g'
-    ?`<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'gonderilen')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`
-    :`<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.odeme||0}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'satin')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`;
+    tbody.innerHTML+= type==='g'
+    ? `<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'gonderilen')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`
+    : `<tr class='border-t'><td class='p-2'>${r.tarih}</td><td class='p-2'>${r.provider}</td><td class='p-2'>${r.sms}</td><td class='p-2'>${r.odeme||0}</td><td class='p-2'>${r.aciklama||''}</td><td class='p-2'><button class='text-blue-600' onclick=\"editRecord(${r.id},'satin')\">✏️</button><button class='text-red-600 ml-2' onclick=\"deleteRecord(${r.id})\">🗑️</button></td></tr>`;
   });
 }
 
+// ARAMA
 function filterTables(){
-  const q=searchBox.value.toLowerCase();
+  const q=document.getElementById('searchBox').value.toLowerCase();
   document.querySelectorAll('tbody tr').forEach(tr=>{
     const t=tr.innerText.toLowerCase();
     tr.style.display=t.includes(q)?'':'none';
